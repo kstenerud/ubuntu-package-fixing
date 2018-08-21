@@ -245,6 +245,19 @@ Check if the bug has already been fixed in another ubuntu version:
 
 We see that 3.3.0-1ubuntu1 exists under cosmic, so postfix has been modified there. Let's see what was changed.
 
+#### Clone the Package
+
+    $ git ubuntu clone postfix
+
+This will create a new git clone of the postfix repo, with a remote of "pkg". The current branch will be ubuntu-devel, and the various versions for each distribution version will be under `pkg/ubuntu/version`.
+
+Notes:
+
+ * Due to https://launchpad.net/bugs/1761821, you may get: `fatal: could not read Username for 'https://git.launchpad.net': terminal prompts disabled.` It's safe to ignore this.
+ * First time will add a gitubuntu entry to .gitignore
+
+#### View the Commit Log
+
     $ git log -b pkg/ubuntu/cosmic
     ...
     commit 73cb543efe06a340021cbf538d3ca88abfd96bd8 (tag: pkg/upload/3.3.0-1ubuntu1)
@@ -323,16 +336,16 @@ We use git-ubuntu to make changes to packages.
 First, go back to https://bugs.launchpad.net/ubuntu/+source/postfix/+bug/1753470
 Go to the task (row) that starts with "bionic" and assign the task to yourself and switch the status to "in progress" using the yellow pencil icons. If you don't see yellow pencil icons, you need to get permissions.
 
-#### Step 2: Clone the package
+
+#### Step 2: Clone the package (if you haven't aleady)
+
+Find the repository name:
+
+    $ apt-cache show postfix | grep Source:
+
+In this case, there is no Source field, so we just use postfix.
 
     $ git ubuntu clone postfix
-
-This will create a new git clone of the postfix repo, with a remote of "pkg". The current branch will be ubuntu-devel, and the various versions for each distribution version will be under `pkg/ubuntu/version`.
-
-Notes:
-
- * Due to https://launchpad.net/bugs/1761821, you may get: `fatal: could not read Username for 'https://git.launchpad.net': terminal prompts disabled.` It's safe to ignore this.
- * First time will add a gitubuntu entry to .gitignore
 
 
 #### Step 3: Make a branch based on the appropriate ubuntu branch
