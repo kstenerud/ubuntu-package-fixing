@@ -201,8 +201,8 @@ The user's password in this tester VM will be "ubuntu"
 
     $ uvt-simplestreams-libvirt --verbose sync --source http://cloud-images.ubuntu.com/daily release=bionic arch=amd64
     $ uvt-simplestreams-libvirt --verbose sync release=bionic arch=amd64
-    $ uvt-kvm create testing release=bionic arch=amd64 label=daily --password ubuntu
-    $ uvt-kvm ssh testing
+    $ uvt-kvm create tester release=bionic arch=amd64 label=daily --password ubuntu
+    $ uvt-kvm ssh tester
 
 #### Get up to date and install postfix:
 
