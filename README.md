@@ -247,6 +247,12 @@ We see that 3.3.0-1ubuntu1 exists under cosmic, so postfix has been modified the
 
 #### Clone the Package
 
+Find the repository name:
+
+    $ apt-cache show postfix | grep Source:
+
+In this case, there is no Source field, so we just use postfix.
+
     $ git ubuntu clone postfix
 
 This will create a new git clone of the postfix repo, with a remote of "pkg". The current branch will be ubuntu-devel, and the various versions for each distribution version will be under `pkg/ubuntu/version`.
