@@ -936,7 +936,7 @@ Follow the build link (https://launchpad.net/ubuntu/+source/postfix/3.3.0-1ubunt
 
 ### The Excuses Page
 
-Check the "excuses" or "migration" page for bionic: http://people.canonical.com/~ubuntu-archive/proposed-migration/bionic/update_excuses.html
+Check the "excuses" or "migration" page (for bionic in this case): http://people.canonical.com/~ubuntu-archive/proposed-migration/bionic/update_excuses.html
 
 Eventually, the package with your fixes will appear there (search for postfix in this case). It will show the dep8 tests for postfix and anything that depends on it. Any tests that fail will show in red.
 
