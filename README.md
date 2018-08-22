@@ -330,6 +330,40 @@ d4cb45 sure looks like a fix for this issue!
 Here we see the patch and the change to debian/patches/series to include the patch. This is the fix we need!
 
 
+#### Was it fixed in Debian?
+
+Sometimes the fix may have been updated in Debian instead of Ubuntu. In this case, you'd see a Debian commit in the history where a fix was applied.
+
+For example, let's assume for argument's sake that we had a problem with sshd in xenial, where it would fail to check config files before reloading (https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/1771340). A search of the git log in a later Ubuntu (artful in this case) would reveal this:
+
+    commit 7f06034b1c4ba72dac028ed7879c89b6ee073293 (tag: pkg/import/1%7.5p1-6)
+    Author: Colin Watson <cjwatson@debian.org>
+    Date:   Wed Aug 23 01:41:06 2017 +0100
+
+        Import patches-unapplied version 1:7.5p1-6 to debian/sid
+        
+        Imported using git-ubuntu import.
+        
+        Changelog parent: ff8921c5d749b778bdedef3a73fe9fbf7145be0a
+        
+        New changelog entries:
+          [ Colin Watson ]
+          * Test configuration before starting or reloading sshd under systemd
+            (closes: #865770).
+          * Create /run/sshd under systemd using RuntimeDirectory rather than
+            tmpfiles.d (thanks, Dmitry Smirnov; closes: #864190).
+          [ Dimitri John Ledkov ]
+          * Drop upstart system and user jobs (closes: #872851).
+          [ Chris Lamb ]
+          * Quote IP address in suggested "ssh-keygen -f" calls (closes: #872643).
+
+Our issue would be the same as Debian bug #865770. In such a case, you'd go to salsa.debian.org to search for the commit message, which would bring you to https://salsa.debian.org/ssh-team/openssh/commit/d4181e15b03171d1363cd9d7a50b209697a80b01
+
+You should also mention the salsa link in the fixed up bug report, and possibly include it in your fix commit message.
+
+Since we can't push new versions of packages to previous releases, you'd need to backport the fix by copying what Debian did into a new commit on xenial.
+
+
 
 Apply the Fix
 -------------
@@ -364,12 +398,21 @@ It helps to use a branch name that's descriptive, like `bionic-postconf-segfault
     $ git checkout -b bionic-postconf-segfault-1753470 pkg/ubuntu/bionic-devel
 
 
-#### Step 4: Make a patch to fix the issue
+#### Step 4: Make a patch to fix the issue (maybe)
 
-In this case, the fix has already been applied to cosmic, so we can just cherry-pick it:
+If the only changes you made are within the debian subdir, you don't need a patchfile, and can skip this step.
 
-    $ git cherry-pick d4cb4562480496f8a1b25ddc397cef45dd45d855
+If you've made changes to the upstream code (anything outside of the debian directory), you'll need to generate a patch in debian/patches. The Debian `quilt` tool (https://wiki.debian.org/UsingQuilt) can do this:
 
+    $ dquilt new fix-postconf-segfault.diff
+    $ dquilt add src/postconf/postconf_dbms.c
+    (modify file)
+    $ dquilt refresh
+    $ dquilt pop -a
+
+Unfortunately, this requires you to add the file to quilt BEFORE you do any modifications, so if you forget to do so, you're stuck. An alternative method would be to make the fix (to everything EXCEPT stuff in the debian dir), then:
+
+     $ git diff >debain/patches/fix-postconf-segfault.diff
 
 The patch file (debian/patches/fix-postconf-segfault.diff) must have a DEP3 header (http://dep.debian.net/deps/dep3):
 
@@ -396,6 +439,10 @@ Then add the patch to the end of the debian/patches/series file (already done in
     70_postfix-check.diff
     tls_version.diff
     fix-postconf-segfault.diff
+
+In our case, the fix has already been applied to cosmic, so we can just cherry-pick it:
+
+    $ git cherry-pick d4cb4562480496f8a1b25ddc397cef45dd45d855
 
 Now make sure the patch applies cleanly:
 
@@ -578,6 +625,7 @@ Now click "Activate".
 
 When it finishes, you should be able to see it e.g. https://launchpad.net/~kstenerud/+archive/ubuntu/postfix-postconf-segfault-1753470/+packages
 
+Note: You must wait for the package to build server-side before you can use the PPA to install packages!
 
 
 Test the Package
@@ -611,6 +659,7 @@ Record your steps as you go (you'll need them later):
 In this case, I'm using the PPA. Alternatively, if you've built locally, you can copy in the .deb file and install it manually.
 
     $ sudo add-apt-repository -y ppa:kstenerud/postfix-postconf-segfault-1753470
+    $ sudo apt update
     $ sudo apt upgrade -y
 
 
@@ -847,3 +896,55 @@ Modify the bug description (yellow pencil icon) and update it to conform with ht
 Note: Keep the original description as-is, in a section called `[Original Description]` at the bottom.
 
 Note: You'll see your branch and merge proposal in the `Related branches` because of the (LP: #xxxx) in the changelog entry.
+
+
+When the Bugfix is Accepted
+---------------------------
+
+### The Acceptance Email
+
+You'll receive an email notification that the bugfix was accepted:
+
+    Accepted postfix into bionic-proposed. The package will build now and be
+    available at
+    https://launchpad.net/ubuntu/+source/postfix/3.3.0-1ubuntu0.1 in a few
+    hours, and then in the -proposed repository.
+
+    Please help us by testing this new package.  See
+    https://wiki.ubuntu.com/Testing/EnableProposed for documentation on how
+    to enable and use -proposed.Your feedback will aid us getting this
+    update out to other Ubuntu users.
+
+    If this package fixes the bug for you, please add a comment to this bug,
+    mentioning the version of the package you tested and change the tag from
+    verification-needed-bionic to verification-done-bionic. If it does not
+    fix the bug for you, please add a comment stating that, and change the
+    tag to verification-failed-bionic. In either case, details of your
+    testing will help us make a better decision.
+
+    Further information regarding the verification process can be found at
+    https://wiki.ubuntu.com/QATeam/PerformingSRUVerification .  Thank you in
+    advance!
+
+    ** Changed in: postfix (Ubuntu Bionic)
+           Status: In Progress => Fix Committed
+
+    ** Tags added: verification-needed verification-needed-bionic
+
+Follow the build link (https://launchpad.net/ubuntu/+source/postfix/3.3.0-1ubuntu0.1) and make sure that it's publishing to the correct place (bionic), and that the builds completed (green checkmarks).
+
+
+### The Excuses Page
+
+Check the "excuses" or "migration" page for bionic: http://people.canonical.com/~ubuntu-archive/proposed-migration/bionic/update_excuses.html
+
+Eventually, the package with your fixes will appear there (search for postfix in this case). It will show the dep8 tests for postfix and anything that depends on it. Any tests that fail will show in red.
+
+Note: This page is generated every few minutes, and doesn't update realtime.
+
+
+### SRU Verification
+
+It's best to have the package independently verified (preferably by the person who reported the bug), but if it sits idle too long (2 days or so), you can verify it yourself.
+
+https://people.canonical.com/~ubuntu-archive/pending-sru.html shows what SRUs are pending, and what their status is.
