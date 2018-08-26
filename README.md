@@ -410,9 +410,14 @@ If you've made changes to the upstream code (anything outside of the debian dire
     $ dquilt refresh
     $ dquilt pop -a
 
-Unfortunately, this requires you to add the file to quilt BEFORE you do any modifications, so if you forget to do so, you're stuck. An alternative method would be to make the fix (to everything EXCEPT stuff in the debian dir), then:
+Unfortunately, this requires you to add the file to quilt BEFORE you do any modifications, so if you forget to do so, you're stuck. An alternative method would be to make all your changes (to everything EXCEPT stuff in the debian dir), then:
 
-     $ git diff >debain/patches/fix-postconf-segfault.diff
+     $ git diff >debain/patches/fix-postconf-segfault.patch
+
+Check the patchfile to make SURE it's correct, because the next command will wipe out all your changes!
+
+     $ git checkout .
+     $ echo fix-postconf-segfault.patch >> debian/patches/series
 
 The patch file (debian/patches/fix-postconf-segfault.diff) must have a DEP3 header (http://dep.debian.net/deps/dep3):
 
@@ -464,21 +469,28 @@ Now revert the patches:
 
     $ dquilt pop -a
 
-You should see only this:
-
-    $ git status
-    On branch bionic-postconf-segfault-1753470
-    Your branch is ahead of 'pkg/ubuntu/bionic-devel' by 2 commits.
-      (use "git push" to publish your local commits)
+From here, `git status` should show the following if you cherry picked a patch:
 
     Untracked files:
       (use "git add <file>..." to include in what will be committed)
 
         ../../.pc/
 
-    nothing added to commit but untracked files present (use "git add" to track)
+Or the following if you created a patch:
 
-`.pc` is the control directory for quilt patches. Remove it manually.
+    Changes not staged for commit:
+      (use "git add <file>..." to update what will be committed)
+      (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   debian/patches/series
+
+    Untracked files:
+      (use "git add <file>..." to include in what will be committed)
+
+        .pc/
+        debian/patches/fix-postconf-segfault.diff
+
+`.pc` is the control directory for quilt patches. Remove it manually before committing.
 
 
 #### Step 5: Commit the patch
