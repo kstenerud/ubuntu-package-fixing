@@ -47,24 +47,7 @@ You may also want to add the following to your .gitconfig:
 
 ### Set up Quilt
 
-#### append to ~/.bashrc:
-
-    alias dquilt="quilt --quiltrc=${HOME}/.quiltrc-dpkg"
-
 #### create ~/.quiltrc:
-
-    d=. ; while [ ! -d $d/debian -a `readlink -e $d` != / ]; do d=$d/..; done
-    if [ -d $d/debian ] && [ -z $QUILT_PATCHES ]; then
-        # if in Debian packaging tree with unset $QUILT_PATCHES
-        QUILT_PATCHES="debian/patches"
-        QUILT_PATCH_OPTS="--reject-format=unified"
-        QUILT_DIFF_ARGS="-p ab --no-timestamps --no-index --color=auto"
-        QUILT_REFRESH_ARGS="-p ab --no-timestamps --no-index"
-        QUILT_COLORS="diff_hdr=1;32:diff_add=1;34:diff_rem=1;31:diff_hunk=1;33:diff_ctx=35:diff_cctx=33"
-        if ! [ -d $d/debian/patches ]; then mkdir $d/debian/patches; fi
-    fi
-
-#### create ~/.quiltrc-dpkg:
 
     d=. ; while [ ! -d $d/debian -a `readlink -e $d` != / ]; do d=$d/..; done
     if [ -d $d/debian ] && [ -z $QUILT_PATCHES ]; then
@@ -405,11 +388,11 @@ If the only changes you made are within the debian subdir, you don't need a patc
 
 If you've made changes to the upstream code (anything outside of the debian directory), you'll need to generate a patch in debian/patches. The Debian `quilt` tool (https://wiki.debian.org/UsingQuilt) can do this:
 
-    $ dquilt new fix-postconf-segfault.diff
-    $ dquilt add src/postconf/postconf_dbms.c
+    $ quilt new fix-postconf-segfault.diff
+    $ quilt add src/postconf/postconf_dbms.c
     (modify file)
-    $ dquilt refresh
-    $ dquilt pop -a
+    $ quilt refresh
+    $ quilt pop -a
 
 Unfortunately, this requires you to add the file to quilt BEFORE you do any modifications, so if you forget to do so, you're stuck. An alternative method would be to make all your changes (to everything EXCEPT stuff in the debian dir), then:
 
@@ -435,9 +418,9 @@ The patch file (debian/patches/fix-postconf-segfault.diff) must have a DEP3 head
     ---
     This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 
-You can use dquilt to add the header automatically (already done in this case):
+You can use quilt to add the header automatically (already done in this case):
 
-    $ dquilt header -e --dep3 <patchname>
+    $ quilt header -e --dep3 <patchname>
 
 Then add the patch to the end of the debian/patches/series file (already done in this case):
 
@@ -452,7 +435,7 @@ In our case, the fix has already been applied to cosmic, so we can just cherry-p
 
 Now make sure the patch applies cleanly:
 
-    $ dquilt push -a
+    $ quilt push -a
     ...
     Applying patch 70_postfix-check.diff
     patching file conf/postfix-script
@@ -468,7 +451,7 @@ Now make sure the patch applies cleanly:
 
 Now revert the patches:
 
-    $ dquilt pop -a
+    $ quilt pop -a
 
 From here, `git status` should show the following if you cherry picked a patch:
 
