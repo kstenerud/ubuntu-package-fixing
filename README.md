@@ -175,7 +175,7 @@ Looking through the bug report (https://bugs.launchpad.net/ubuntu/+source/postfi
 
 #### Make a container for testing:
 
-    $ lxc launch ubuntu:bionic tester
+    $ lxc launch ubuntu-daily:bionic tester
     $ lxc exec tester bash
 
 #### Alternatively: Make a VM for testing:
@@ -539,35 +539,19 @@ First, you must build the package with the fixes in place.
 
 ### Building the package
 
-There are two ways to build. Both require an LXD container. We need bionic, so download the image via the lxc command and then find its fingerprint using `lxc image list`:
-
-    $ lxc image copy ubuntu:bionic local:
-    Image copied successfully!
-    $ lxc image list
-    +-------+--------------+--------+---------------------------------------------+--------+----------+-------------------------------+
-    | ALIAS | FINGERPRINT  | PUBLIC |                 DESCRIPTION                 |  ARCH  |   SIZE   |          UPLOAD DATE          |
-    +-------+--------------+--------+---------------------------------------------+--------+----------+-------------------------------+
-    |       | 366bca8abe94 | no     | ubuntu 14.04 LTS amd64 (release) (20180818) | x86_64 | 121.89MB | Aug 19, 2018 at 12:22am (UTC) |
-    +-------+--------------+--------+---------------------------------------------+--------+----------+-------------------------------+
-    |       | 9023b2feede5 | no     | ubuntu 16.04 LTS amd64 (release) (20180814) | x86_64 | 157.91MB | Aug 15, 2018 at 6:23pm (UTC)  |
-    +-------+--------------+--------+---------------------------------------------+--------+----------+-------------------------------+
-    |       | a0c277000044 | no     | ubuntu 18.10 amd64 (daily) (20180815)       | x86_64 | 174.09MB | Aug 16, 2018 at 6:14am (UTC)  |
-    +-------+--------------+--------+---------------------------------------------+--------+----------+-------------------------------+
-    |       | bbb592c417b6 | no     | ubuntu 18.04 LTS amd64 (release) (20180814) | x86_64 | 173.90MB | Aug 15, 2018 at 6:13pm (UTC)  |
-    +-------+--------------+--------+---------------------------------------------+--------+----------+-------------------------------+
-    |       | c4e7fda05c09 | no     | Debian sid amd64 (20180820_05:25)           | x86_64 | 124.72MB | Aug 20, 2018 at 2:03pm (UTC)  |
-    +-------+--------------+--------+---------------------------------------------+--------+----------+-------------------------------+
-
-In my case, it's `bbb592c417b6`.
-
+There are two ways to build. Both require an LXD container.
 
 ### Build it locally
 
-This method is an acceptable fallback when servers are overloaded.
+You might want to built it locally because it's quick, or because you want to debug some build failure.
 
-    $ git ubuntu build -v --lxd-image bbb592c417b6
+    $ git ubuntu build -v
 
-This will start a container, build the packages, copy them to `../` and shut down.
+git ubuntu will automatically try to detect which Ubuntu release the build needs, based on the package's changelog file. If that fails, you can always specify an image directly, like this:
+
+    $ git ubuntu build -v --lxd-image ubuntu-daily:bionic
+
+This will download the LXD image if needed, start a container, build the packages, copy them to `../` and shut down.
 
 
 ### Build it as a PPA
@@ -581,11 +565,11 @@ For the PPA, we need a commit in the local repo with a version that will be lowe
 
 Commit the change with a dummy message like "ppa1", but **do not push this change!**
 
-Build the sources using your `bionic` lxd image:
+Build the source package this time:
 
-    $ git ubuntu build-source -v --lxd-image bbb592c417b6 --sign
+    $ git ubuntu build-source -v --sign
 
-Note: You'll get some errors like `08/16/2018 12:11:32 - ERROR:Failed to run apt-get in ephemeral build container (attempt 2/6)` due to timing issues bringing the network up.
+Note: You may get some errors like `08/16/2018 12:11:32 - ERROR:Failed to run apt-get in ephemeral build container (attempt 2/6)` due to timing issues bringing the network up.
 
 It will start a container, install the build tools + dependencies, build the source package, then pull the files out of the container and put them in `../`
 
@@ -598,7 +582,7 @@ It will start a container, install the build tools + dependencies, build the sou
     -rw-rw-r--  1 karl kvm    2952 Aug 20 09:54 postfix_3.3.0-1ubuntu0.1~ppa1_source.changes
     -rw-rw-r--  1 karl kvm 4419450 Aug 20 09:34 postfix_3.3.0.orig.tar.gz
 
-Note: If the signing failed, you can do it manually:
+Note: If the signing failed, because you didn't see the passphrase prompt in time, for example, you can do it manually:
 
     $ debsign ../postfix_3.3.0-1ubuntu0.1~ppa1_source.changes
 
@@ -629,7 +613,7 @@ Test the Package
 
 ### Start a bionic container and enter it:
 
-    $ lxc launch ubuntu:bionic tester
+    $ lxc launch ubuntu-daily:bionic tester
     Creating tester
     Starting tester
     $ lxc exec tester bash
@@ -788,7 +772,7 @@ Example:
 
     Steps to test:
 
-    # lxc launch ubuntu:bionic builder
+    # lxc launch ubuntu-daily:bionic builder
     # lxc exec builder bash
 
     # apt dist-upgrade
