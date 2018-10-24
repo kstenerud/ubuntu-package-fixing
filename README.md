@@ -396,7 +396,7 @@ If you've made changes to the upstream code (anything outside of the debian dire
 
 Unfortunately, this requires you to add the file to quilt BEFORE you do any modifications, so if you forget to do so, you're stuck. An alternative method would be to make all your changes (to everything EXCEPT stuff in the debian dir), then:
 
-     $ git diff >debain/patches/fix-postconf-segfault.patch
+     $ git diff >debian/patches/fix-postconf-segfault.patch
 
 Check the patchfile to make SURE it's correct, because the next command will wipe out all your changes!
 
@@ -553,6 +553,23 @@ git ubuntu will automatically try to detect which Ubuntu release the build needs
 
 This will download the LXD image if needed, start a container, build the packages, copy them to `../` and shut down.
 
+### Build it manually
+
+If git ubuntu build fails, you can do it manually like so:
+
+    cd ..
+    lxc launch ubuntu:bionic builder
+    tar cf - postfix | lxc exec builder -- tar xf - -C /root
+    lxc exec builder bash
+    apt update
+    apt install -y ubuntu-dev-tools
+    pull-lp-source -d postfix bionic
+    cd postfix
+    apt build-dep -y ./
+    dpkg-buildpackage -S
+    exit
+    lxc exec builder -- sh -c "cd /root; tar cf - postfix_*" | tar xf -
+    lxc delete -f builder
 
 ### Build it as a PPA
 
@@ -918,6 +935,8 @@ Follow the build link (https://launchpad.net/ubuntu/+source/postfix/3.3.0-1ubunt
 
 Check the "excuses" or "migration" page (for bionic in this case): http://people.canonical.com/~ubuntu-archive/proposed-migration/bionic/update_excuses.html
 
+General page: http://people.canonical.com/~ubuntu-archive/proposed-migration/update_excuses.html
+
 Eventually, the package with your fixes will appear there (search for postfix in this case). It will show the dep8 tests for postfix and anything that depends on it. Any tests that fail will show in red.
 
 Note: This page is generated every few minutes, and doesn't update realtime.
@@ -928,3 +947,47 @@ Note: This page is generated every few minutes, and doesn't update realtime.
 It's best to have the package independently verified (preferably by the person who reported the bug), but if it sits idle too long (2 days or so), you can verify it yourself.
 
 https://people.canonical.com/~ubuntu-archive/pending-sru.html shows what SRUs are pending, and what their status is.
+
+
+### SDFSFSDFSFD
+
+Once uploaded, move card to "external dependencies"
+add label for who is the external party
+- For changes to already released ubuntu, use sru-team-action
+Check the queue for your package. e.g.: https://launchpad.net/ubuntu/xenial/+queue
+Add a comment to the card, mentioning that you've checked where the package is, and what it's waiting for.
+
+when it's been accepted into -proposed:
+
+check https://people.canonical.com/~ubuntu-archive/pending-sru.html
+Your package should be green. If not, find out why.
+
+https://launchpad.net/ubuntu/xenial/+queue
+
+
+### Running qa regression tests
+
+Go to https://launchpad.net/qa-regression-testing
+
+Click Code
+
+Get git repo location.
+
+Spin up a vm or container
+
+clone repo
+
+    git clone https://git.launchpad.net/qa-regression-testing
+
+Go into scripts and run: sudo ./install-packages test-foo.py
+
+    
+
+
+-----
+pull-debian-source <pakage>
+
+salsa.debian.org
+
+Make sure pulled source matches what's in salsa
+
