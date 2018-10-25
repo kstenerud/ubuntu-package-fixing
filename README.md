@@ -424,7 +424,7 @@ The patch file (debian/patches/fix-postconf-segfault.diff) must have a DEP3 head
 
 **Origin**: Where the code came from:
 
-  * upstream = original software site, such as samba.org
+  * upstream = points to code on the original software site, such as samba.org
   * backport = you had to change the code to fit an ubuntu requirement
   * vendor = the code came from some vendor like red hat, suse, etc.
   * other = the code came from somewhere else
@@ -435,7 +435,7 @@ The patch file (debian/patches/fix-postconf-segfault.diff) must have a DEP3 head
 
 **Forwarded**: Information about where you sent the patch if it hasn't been upstreamed. Only useful for vendor specific patches.
 
-**Applied-Upstream**: If the patch has already been applied upstream, link to it.
+**Applied-Upstream**: If the patch has already been applied upstream, link to it. Not needed if you have Origin upstream.
 
 You can use `dep3changelog` to verify the headers, as well as generate a changelog entry.
 
