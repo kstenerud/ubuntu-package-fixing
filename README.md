@@ -418,6 +418,30 @@ The patch file (debian/patches/fix-postconf-segfault.diff) must have a DEP3 head
     ---
     This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 
+##### Notes on the Patch Header Fields
+
+**Author**: Refers to code authorship, not patch authorship. Use the name of whoever wrote the original code in the patch.
+
+**Origin**: Where the code came from:
+
+  * upstream = original software site, such as samba.org
+  * backport = you had to change the code to fit an ubuntu requirement
+  * vendor = the code came from some vendor like red hat, suse, etc.
+  * other = the code came from somewhere else
+
+**Bug**: Bug report on the upstream site, if any.
+
+**Bug-[Vendor]**: Bug report on a vendor's site. We should have one for Ubuntu, but often there will also be reports from other vendors like Debian, Red Hat, etc. Add them if they're readily available, but you don't need to go hunting for them.
+
+**Forwarded**: Information about where you sent the patch if it hasn't been upstreamed. Only useful for vendor specific patches.
+
+**Applied-Upstream**: If the patch has already been applied upstream, link to it.
+
+You can use `dep3changelog` to verify the headers, as well as generate a changelog entry.
+
+
+##### Automatic Header Generation
+
 You can use quilt to add the header automatically (already done in this case):
 
     $ quilt header -e --dep3 <patchname>
@@ -488,6 +512,8 @@ When committing the patch to git, make sure the message shows which files you've
 ```
 
 This style of commit message makes integration with the other tools you'll be using easier because it's already in changelog format. The `(LP: #1753470)` at the end will auto-close that bug once the package is published to updates.
+
+Use "Thanks to" when you are not the author of the code being submitted.
 
 
 #### Step 6: Modify the changelog
