@@ -424,7 +424,7 @@ The patch file (debian/patches/fix-postconf-segfault.diff) must have a DEP3 head
 
 **Origin**: Where the code came from:
 
-  * upstream = points to code on the original software site, such as samba.org
+  * upstream = points to code on the original software site or repo.
   * backport = you had to change the code to fit an ubuntu requirement
   * vendor = the code came from some vendor like red hat, suse, etc.
   * other = the code came from somewhere else
@@ -908,6 +908,11 @@ It only lists core, so the second reviewer is `canonical-server-core-reviewers`.
  * Click "Requst another review" in the reviewer section.
  * Type in `canonical-server-core-reviewers`
 
+#### Get Sponsorship
+
+Once your MP has been reviewed, request sponsorship, pointing to the git commit at the head:
+
+    Please sponsor this MP. Git commit: 566d8c9eff6a13c25c2ef5f5d9e176f49c52a3b4
 
 Update the Bug Report
 ---------------------
