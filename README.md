@@ -520,6 +520,18 @@ Use "Thanks to" when you are not the author of the code being submitted.
 
 The changelog needs to be modified in very specific ways. Look at https://wiki.ubuntu.com/SecurityTeam/UpdatePreparation#Update_the_packaging
 
+For fixes and security updates, it'll generally work like this, except for the rare case that a new upstream release is being pushed:
+
+| Previous version             | Security update                               |
+| ---------------------------- | --------------------------------------------- |
+| 2.0-2                        | 2.0-2ubuntu0.1                                |
+| 2.0-2ubuntu2                 | 2.0-2ubuntu2.1                                |
+| 2.0-2ubuntu2.1               | 2.0-2ubuntu2.2                                |
+| 2.0-2build1                  | 2.0-2ubuntu0.1                                |
+| 2.0                          | 2.0ubuntu0.1                                  |
+| 2.0-2 in two releases        | 2.0-2ubuntu0.11.10.1 and 2.0-2ubuntu0.12.04.1 |
+| 2.0-2ubuntu1 in two releases | 2.0-2ubuntu1.11.10.1 and 2.0-2ubuntu1.12.04.1 |
+
 The current postfix version in bionic is `3.3.0-1`. The current version in cosmic is `3.3.0-1ubuntu1`. Versions in bionic should always be "lower" than versions in cosmic so that upgrading to cosmic uses the cosmic version of the package. In this case, we can use `3.3.0-1ubuntu0.1`.
 
 You can use `git-ubuntu.reconstruct-changelog <base branch>` to construct a changelog entry:
